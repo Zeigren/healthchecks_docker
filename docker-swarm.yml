@@ -1,25 +1,32 @@
-version: '3.7'
+version: "3.8"
+# https://docs.docker.com/compose/compose-file/compose-file-v3/
 services:
   nginx:
     image: nginx:alpine
+    # https://hub.docker.com/_/nginx
     networks:
       - healthchecks
     volumes:
       - static:/var/www/healthchecks/static
     ports:
-      - "80:80"
-      - "443:443"
+      # CHANGE TO "80:80" IF USING NGINX FOR SSL TERMINATION
+      - "9080:80"
+      # UNCOMMENT IF USING NGINX FOR SSL TERMINATION
+      # - "443:443"
     configs:
       - source: healthchecks_vhost
         target: /etc/nginx/conf.d/default.conf
     secrets:
-      - source: yourdomain.test.crt
-        target: /etc/nginx/certs/yourdomain.test.crt
-      - source: yourdomain.test.key
-        target: /etc/nginx/certs/yourdomain.test.key
+    # UNCOMMENT IF USING NGINX FOR SSL TERMINATION
+    # secrets:
+    #   - source: yourdomain.test.crt
+    #     target: /etc/nginx/certs/yourdomain.test.crt
+    #   - source: yourdomain.test.key
+    #     target: /etc/nginx/certs/yourdomain.test.key
 
   healthchecks:
     image: zeigren/healthchecks:latest
+    # https://hub.docker.com/r/zeigren/healthchecks
     networks:
       - healthchecks
     volumes:
@@ -27,7 +34,7 @@ services:
       - db:/usr/src/app/db
     environment:
       - REGISTRATION_OPEN=True
-      - SITE_ROOT=https://healthcheck.yourdomain.test
+      - SITE_ROOT=https://healthchecks.yourdomain.test
       # - MATRIX_ACCESS_TOKEN=DOCKER-SECRET->BOT_MATRIX_ACCESS_TOKEN
     # secrets:
     #   - BOT_MATRIX_ACCESS_TOKEN
@@ -44,9 +51,10 @@ configs:
     external: true
 
 secrets:
-  yourdomain.test.crt:
-    external: true
-  yourdomain.test.key:
-    external: true
+# UNCOMMENT IF USING NGINX FOR SSL TERMINATION
+# yourdomain.test.crt:
+#   external: true
+# yourdomain.test.key:
+#   external: true
 #   BOT_MATRIX_ACCESS_TOKEN:
 #     external: true
