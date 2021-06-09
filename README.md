@@ -5,7 +5,7 @@
 
 ## Usage
 
-Use [Docker Compose](https://docs.docker.com/compose/) or [Docker Swarm](https://docs.docker.com/engine/swarm/) to deploy Healthchecks. Templates included for using NGINX or Traefik for SSL termination.
+Use [Docker Compose](https://docs.docker.com/compose/) or [Docker Swarm](https://docs.docker.com/engine/swarm/) to deploy. There are examples for using NGINX or Traefik for SSL termination, or don't use SSL at all.
 
 ## Links
 
@@ -26,7 +26,7 @@ Use [Docker Compose](https://docs.docker.com/compose/) or [Docker Swarm](https:/
 
 Configuration consists of variables in the `.yml` and `.conf` files.
 
-- healthchecks_vhost = A simple NGINX vhost file for Healthchecks (templates included, use `healthchecks_vhost_ssl` if you're using NGINX for SSL termination)
+- healthchecks_nginx.conf = NGINX config file (only needs to be modified if you're using NGINX for SSL termination)
 - Make whatever changes you need to the appropriate `.yml`. Environment variables for Healthchecks can be found in the `docker-entrypoint.sh` and the [healthchecks.io](https://healthchecks.io/docs/self_hosted_configuration/) website
 
 ### Using NGINX for SSL Termination

@@ -8,7 +8,7 @@ services:
       - healthchecks
     volumes:
       - static:/var/www/healthchecks/static
-      - ./config/healthchecks_vhost.conf:/etc/nginx/conf.d/default.conf
+      - ./config/healthchecks_nginx.conf:/etc/nginx/templates/nginx.conf.template
       # UNCOMMENT IF USING NGINX FOR SSL TERMINATION
       # - ./config/yourdomain.test.crt:/etc/nginx/certs/yourdomain.test.crt
       # - ./config/yourdomain.test.key:/etc/nginx/certs/yourdomain.test.key
@@ -17,6 +17,22 @@ services:
       - "9080:80"
       # UNCOMMENT IF USING NGINX FOR SSL TERMINATION
       # - "443:443"
+    environment:
+      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
+      # https://nginx.org/en/docs/ngx_core_module.html#worker_processes
+      - NGINX_WORKER_PROCESSES=auto
+      # https://nginx.org/en/docs/ngx_core_module.html#worker_rlimit_nofile
+      - NGINX_WORKER_RLIMIT_NOFILE=65535
+      # https://nginx.org/en/docs/ngx_core_module.html#worker_connections
+      - NGINX_WORKER_CONNECTIONS=65535
+      # https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size
+      - NGINX_CLIENT_MAX_BODY_SIZE=10m
+      # https://nginx.org/en/docs/http/ngx_http_core_module.html#client_body_timeout
+      - NGINX_CLIENT_BODY_TIMEOUT=30s
+      - NGINX_HOST=localhost
+      # UNCOMMENT IF USING NGINX FOR SSL
+      # - NGINX_SSL_CERT=yourdomain.test.crt
+      # - NGINX_SSL_KEY=yourdomain.test.key
 
   healthchecks:
     image: zeigren/healthchecks:latest
