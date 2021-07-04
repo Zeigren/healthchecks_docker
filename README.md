@@ -15,6 +15,7 @@ Use [Docker Compose](https://docs.docker.com/compose/) or [Docker Swarm](https:/
 
 ## Tags
 
+- v1.21.0
 - v1.20.0
 
 ## Stack
