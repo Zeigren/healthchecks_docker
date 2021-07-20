@@ -1,39 +1,30 @@
 version: "3.8"
 # https://docs.docker.com/compose/compose-file/compose-file-v3/
 services:
-  nginx:
-    image: nginx:alpine
-    # https://hub.docker.com/_/nginx
+  caddy:
+    image: caddy:latest
+    # https://hub.docker.com/_/caddy
+    volumes:
+      - static:/var/www/healthchecks/static
+      - caddy_data:/data
     networks:
       - healthchecks
       - traefik
-    volumes:
-      - static:/var/www/healthchecks/static
     configs:
-      - source: healthchecks_nginx.conf
-        target: /etc/nginx/templates/nginx.conf.template
+      - source: healthchecks_caddyfile
+        target: /etc/caddy/Caddyfile
     environment:
-      - NGINX_ENVSUBST_OUTPUT_DIR=/etc/nginx
-      # https://nginx.org/en/docs/ngx_core_module.html#worker_processes
-      - NGINX_WORKER_PROCESSES=auto
-      # https://nginx.org/en/docs/ngx_core_module.html#worker_rlimit_nofile
-      - NGINX_WORKER_RLIMIT_NOFILE=65535
-      # https://nginx.org/en/docs/ngx_core_module.html#worker_connections
-      - NGINX_WORKER_CONNECTIONS=65535
-      # https://nginx.org/en/docs/http/ngx_http_core_module.html#client_max_body_size
-      - NGINX_CLIENT_MAX_BODY_SIZE=10m
-      # https://nginx.org/en/docs/http/ngx_http_core_module.html#client_body_timeout
-      - NGINX_CLIENT_BODY_TIMEOUT=30s
-      - NGINX_HOST=healthchecks.yourdomain.test
+      # https://caddyserver.com/docs/automatic-https#overview
+      - DOMAIN=:80
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.bookstack.entrypoints=websecure"
-        - "traefik.http.routers.bookstack.rule=Host(`healthchecks.yourdomain.test`)"
-        - "traefik.http.services.bookstack.loadbalancer.server.port=80" # Port traefik needs to route traffic to
+        - "traefik.http.routers.healthchecks.entrypoints=websecure"
+        - "traefik.http.routers.healthchecks.rule=Host(`healthchecks.yourdomain.test`)"
+        - "traefik.http.services.healthchecks.loadbalancer.server.port=80" # Port traefik needs to route traffic to
 
   healthchecks:
-    image: zeigren/healthchecks:latest
+    image: zeigren/healthchecks:latest # ghcr.io/zeigren/healthchecks_docker:latest
     # https://hub.docker.com/r/zeigren/healthchecks
     networks:
       - healthchecks
@@ -54,10 +45,11 @@ networks:
 
 volumes:
   static:
+  caddy_data:
   db:
 
 configs:
-  healthchecks_nginx.conf:
+  healthchecks_caddyfile:
     external: true
 # secrets:
 #   BOT_MATRIX_ACCESS_TOKEN:

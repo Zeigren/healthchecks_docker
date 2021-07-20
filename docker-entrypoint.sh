@@ -4,25 +4,15 @@ set -e
 
 if [ ! -f "$APP_ROOT/secret_key.txt" ]; then
   echo "Creating Secret Key"
-  cat > "$APP_ROOT/password.awk" <<EOF
-BEGIN {
-    srand();
-    chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-    s = "";
-    for(i=0;i<50;i++) {
-        s = s "" substr(chars, int(rand()*62), 1);
-    }
-    print s
-}
 
-EOF
-  awk -f password.awk > "$APP_ROOT/secret_key.txt"
-  rm password.awk
+  key=$(tr </dev/urandom -cd 'a-zA-Z0-9' | head -c 50)
+
+  echo "$key" >"$APP_ROOT/secret_key.txt"
 fi
 
 echo "Creating gunicorn.conf.py"
 # https://docs.gunicorn.org/en/stable/configure.html
-cat > "$APP_ROOT/gunicorn.conf.py" <<EOF
+cat >"$APP_ROOT/gunicorn.conf.py" <<EOF
 import multiprocessing
 
 bind = "0.0.0.0:8000"
@@ -31,12 +21,11 @@ workers = ${GUNICORN_WORKERS:-multiprocessing.cpu_count() * 2}
 
 max_requests = 1000
 max_requests_jitter = 50
-
 EOF
 
 echo "Creating local_settings.py"
 # https://docs.djangoproject.com/en/3.2/ref/settings/
-cat > "$APP_HOME/local_settings.py" <<EOF
+cat >"$APP_HOME/local_settings.py" <<EOF
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -90,7 +79,6 @@ TWILIO_AUTH = "${TWILIO_AUTH:-}"
 
 # Trello
 TRELLO_APP_KEY = "${TRELLO_APP_KEY:-}"
-
 EOF
 
 # https://docs.djangoproject.com/en/3.2/ref/django-admin/
