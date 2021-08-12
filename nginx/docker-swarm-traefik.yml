@@ -28,9 +28,9 @@ services:
     deploy:
       labels:
         - "traefik.enable=true"
-        - "traefik.http.routers.bookstack.entrypoints=websecure"
-        - "traefik.http.routers.bookstack.rule=Host(`healthchecks.yourdomain.test`)"
-        - "traefik.http.services.bookstack.loadbalancer.server.port=80" # Port traefik needs to route traffic to
+        - "traefik.http.routers.healthchecks.entrypoints=websecure"
+        - "traefik.http.routers.healthchecks.rule=Host(`healthchecks.yourdomain.test`)"
+        - "traefik.http.services.healthchecks.loadbalancer.server.port=80" # Port traefik needs to route traffic to
 
   healthchecks:
     image: zeigren/healthchecks:latest

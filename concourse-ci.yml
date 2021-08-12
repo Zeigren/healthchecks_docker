@@ -7,7 +7,6 @@ resources:
     type: git
     icon: git
     public: true
-    # check_every: 24h
     source:
       uri: https://github.com/Zeigren/healthchecks_docker.git
       branch: main
@@ -22,6 +21,7 @@ resources:
       repository: ghcr.io/zeigren/healthchecks_docker
       username: Zeigren
       password: ((github_token.token))
+      tag: latest
 
   - name: dockerhub-image
     type: registry-image
@@ -32,6 +32,7 @@ resources:
       repository: zeigren/healthchecks
       username: zeigren
       password: ((dockerhub_password.password))
+      tag: latest
 
 # https://concourse-ci.org/jobs.html
 jobs:
@@ -68,10 +69,8 @@ jobs:
           - put: github-image
             params:
               image: image/image.tar
-              version: ((.:version-tag))
-              bump_aliases: true
+              additional_tags: git-repo/version
           - put: dockerhub-image
             params:
               image: image/image.tar
-              version: ((.:version-tag))
-              bump_aliases: true
+              additional_tags: git-repo/version

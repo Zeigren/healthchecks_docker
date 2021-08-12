@@ -21,17 +21,6 @@ RUN git clone --branch ${VERSION} --depth 1 ${APP_REPO} ${APP_ROOT} \
     && pip install --upgrade pip setuptools wheel \
     && pip install --no-cache-dir -U -r /usr/src/app/requirements.txt gunicorn
 
-COPY env_secrets_expand.sh docker-entrypoint.sh /
-
-RUN chmod +x /env_secrets_expand.sh \
-    && chmod +x /docker-entrypoint.sh
-
-WORKDIR ${APP_ROOT}
-
-ENTRYPOINT ["/docker-entrypoint.sh"]
-
-CMD ["gunicorn", "-c", "gunicorn.conf.py", "hc.wsgi:application"]
-
 
 FROM python:alpine AS production
 
